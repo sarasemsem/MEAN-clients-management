@@ -3,18 +3,13 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  baseApi:"http://localhost:8082",
+  baseApi:"http://localhost:3000",
   production: false
 };
 
 export const rest = {
-  email:"/api/v1/email",
-  contact:"/api/v1/senders",
-  categories:"/api/v1/categories",
-  users:"/api/v1/users",
-  SecurityRole:"/api/v1/SecurityRole",
-  keyword:"/api/v1/keywords",
-  action:"/api/v1/actions",
+  login:"/api/auth/login",
+  users:"/api/users",
   production: false
 };
 /*

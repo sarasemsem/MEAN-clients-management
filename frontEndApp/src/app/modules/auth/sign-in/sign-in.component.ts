@@ -1,6 +1,6 @@
 import { NgIf } from '@angular/common';
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormsModule, NgForm, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, NgForm, ReactiveFormsModule, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,10 +37,8 @@ export class AuthSignInComponent implements OnInit
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _authService: AuthService,
-        private _formBuilder: UntypedFormBuilder,
+        private _formBuilder: FormBuilder,
         private _router: Router,
-        private authService: AuthService,
-        private router: Router
     )
     {
     }
@@ -54,19 +52,11 @@ export class AuthSignInComponent implements OnInit
      */
     ngOnInit(): void
     {
-        this.authService.clear();
-        this.authService.clearCache().subscribe(  
-      (response) => {
-        console.log("Success: " + response.message); // Log the message property
-      },
-      (error) => {
-        console.error("Error: " + error); // Log error message
-      }
-);
+        this._authService.clear();
         // Create the form
         this.signInForm = this._formBuilder.group({
-            email     : ['hughes.brian@company.com', [Validators.required, Validators.email]],
-            password  : ['admin', Validators.required],
+            email     : ['admin@superadmin.com', [Validators.required, Validators.email]],
+            password  : ['123', Validators.required],
             rememberMe: [''],
         });
     }
@@ -78,63 +68,75 @@ export class AuthSignInComponent implements OnInit
     /**
      * Sign in
      */
-    signIn(): void
-    {
-        // Return if the form is invalid
-        if ( this.signInForm.invalid )
-        {
-            return;
-        }
-
-        // Disable the form
-        this.signInForm.disable();
-
-        // Hide the alert
-        this.showAlert = false;
-
-        // Sign in
-        this.authService.request(
-            "POST",
-            "/login",
-            {
-              "email": this.signInForm.value.email,
-              "password": this.signInForm.value.password
-            }
-          ).then(response => {
-            this.authService.setAuthToken(response.data.langKey);
-            this.authService.setRoles(response.data.roles);
-            this.authService.setUser(response.data.userId, response.data.firstName, response.data.email);        
-                    const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
-
-                    // Navigate to the redirect url
-                    this._router.navigateByUrl(redirectURL);
-
-                },
-            ).catch(error => {
-                console.log(error.message==="Request failed with status code 404");
-                if (error.message==="Request failed with status code 404" ) {
+    signIn(): void {
+      // Return if the form is invalid
+      if (this.signInForm.invalid) {
+          return;
+      }
+  
+      // Disable the form
+      this.signInForm.disable();
+  
+      // Hide the alert
+      this.showAlert = false;
+  
+      // Sign in
+      this._authService.signIn({
+          email: this.signInForm.value.email,
+          password: this.signInForm.value.password
+      }).subscribe(
+          (response) => {
+              // Log the response for debugging
+              console.log('Login response:', response);
+  
+              // Re-enable the form
+              this.signInForm.enable();
+  
+              // Check if response contains the expected data
+              if (response && response.data.user.token) {
+                  // Get the redirect URL from the query parameters or default to '/'
+                  const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+                  console.log('Redirect URL:', redirectURL);
+  
+                  // Navigate to the redirect URL
+                  this._router.navigateByUrl(redirectURL);
+              } else {
+                  // Handle unexpected response structure
+                  this.errorMessage = 'Unexpected response from the server';
+                  this.alert = {
+                      type: 'error',
+                      message: this.errorMessage,
+                  };
+                  this.showAlert = true;
+              }
+          },
+          (error) => {
+              // Log the error for debugging
+              console.log('Login error:', error);
+  
+              // Re-enable the form
+              this.signInForm.enable();
+  
+              // Reset the form
+              this.signInNgForm.resetForm();
+  
+              // Set the error message based on the error status
+              if (error.status === 404 || error.message === "Request failed with status code 404") {
                   this.errorMessage = 'Wrong email or password';
-                }
-                else if (error.status === 404 ) {
-                  this.errorMessage = 'Wrong email or password';
-                } else {
+              } else {
                   this.errorMessage = 'Server Error';
-                }
-
-                // Re-enable the form
-                this.signInForm.enable();
-
-                // Reset the form
-                this.signInNgForm.resetForm();
-
-                // Set the alert
-                this.alert = {
-                    type   : 'error',
-                    message: 'Wrong email or password',
-                };
-
-                // Show the alert
-                this.showAlert = true;
-              });
-    }
+              }
+  
+              // Set the alert
+              this.alert = {
+                  type: 'error',
+                  message: this.errorMessage,
+              };
+  
+              // Show the alert
+              this.showAlert = true;
+          }
+      );
+  }
+  
 }
