@@ -1,9 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import axios from 'axios';
 import { Observable, catchError, of, scheduled, switchMap, tap, throwError } from 'rxjs';
 import { environment, rest } from '@fuse/environments/environment';
-import { UserDTO } from '@fuse/shared/context/DTO';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
 
@@ -52,7 +50,7 @@ export class AuthService {
     );
   }
   getUser(): any {
-    let user = <UserDTO>JSON.parse(sessionStorage.getItem('user')!) || {};
+    let user = <any>JSON.parse(sessionStorage.getItem('user')!) || {};
     return user;
   }
   

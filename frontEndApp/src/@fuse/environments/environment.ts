@@ -9,7 +9,8 @@ export const environment = {
 
 export const rest = {
   login:"/api/auth/login",
-  users:"/api/users",
+  users:"/api/user",
+  clients:"/api/clients",
   production: false
 };
 /*
