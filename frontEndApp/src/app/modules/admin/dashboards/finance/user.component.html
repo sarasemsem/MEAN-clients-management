@@ -9,39 +9,19 @@
                 <div class="font-medium tracking-tight text-secondary">Keep track of your users</div>
             </div>
             <div class="flex items-center ml-6">
-                <button class="hidden sm:inline-flex" mat-stroked-button>
-                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:document-chart-bar'"></mat-icon>
-                    <span class="ml-2">Reports</span>
+                <button class="hidden sm:inline-flex ml-3" mat-flat-button [color]="'primary'" (click)="createUser()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                    <span class="ml-2">Add new</span>
                 </button>
-                <button class="hidden sm:inline-flex ml-3" mat-stroked-button>
-                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:cog-8-tooth'"></mat-icon>
-                    <span class="ml-2">Settings</span>
-                </button>
-                <button class="hidden sm:inline-flex ml-3" mat-flat-button [color]="'primary'">
-                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:arrow-up-tray'"></mat-icon>
-                    <span class="ml-2">Export</span>
-                </button>
-
-                <!-- Actions menu (visible on xs) -->
-                <div class="sm:hidden">
-                    <button [matMenuTriggerFor]="actionsMenu" mat-icon-button>
-                        <mat-icon [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-                    </button>
-                    <mat-menu #actionsMenu="matMenu">
-                        <button mat-menu-item>Export</button>
-                        <button mat-menu-item>Reports</button>
-                        <button mat-menu-item>Settings</button>
-                    </mat-menu>
-                </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 w-full mt-8">
-            <!-- Recent transactions table -->
+            <!-- Users list table -->
             <div class="xl:col-span-2 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
                 <div class="p-6">
-                    <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">Recent transactions</div>
-                    <div class="text-secondary font-medium">1 pending, 4 completed</div>
+                    <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">Users list</div>
+                    <div class="text-secondary font-medium">{{adminsNmb}} admin, {{usersNmb}} user{{usersNmb>1 ? 's' : ''}}</div>
                 </div>
                 <div class="overflow-x-auto mx-6">
                     <table class="w-full bg-transparent" mat-table matSort [dataSource]="userDataSource" [trackBy]="trackByFn" #recentTransactionsTable>
@@ -76,8 +56,8 @@
                             <td mat-cell *matCellDef="let user">
                                 <span class="pr-6 font-medium whitespace-nowrap">
                                     <span class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase"
-                                        [ngClass]="{'bg-red-200 text-red-800 dark:bg-red-600 dark:text-red-50': user.isAdmin === 'false',
-                                                    'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': user.isAdmin === 'true' }">
+                                        [ngClass]="{'bg-red-200 text-red-800 dark:bg-red-600 dark:text-red-50': user.isAdmin === false,
+                                                    'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': user.isAdmin === true }">
                                         <span class="leading-relaxed whitespace-nowrap">{{user.isAdmin}}</span>
                                     </span>
                                 </span>
@@ -89,7 +69,7 @@
                             <th mat-header-cell mat-sort-header *matHeaderCellDef>Action</th>
                             <td mat-cell *matCellDef="let user">
                                 <button mat-button color="primary" (click)="editUser(user)">Edit</button>
-                                <button mat-button color="warn" (click)="deleteUser(user)">Delete</button>
+                                <button mat-button color="warn" (click)="openConfirmationDialog(user)">Delete</button>
                             </td>
                         </ng-container>
 

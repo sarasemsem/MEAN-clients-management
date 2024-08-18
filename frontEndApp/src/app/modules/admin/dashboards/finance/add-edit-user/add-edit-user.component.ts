@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,6 +28,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatButtonToggleModule,
     MatButtonModule,
     MatSelectModule,
+    RouterModule
   ],
   templateUrl: './add-edit-user.component.html',
   styleUrls: ['./add-edit-user.component.scss']
@@ -44,6 +45,7 @@ export class AddEditUserComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
+    private cd: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService
   ) {
     this.userForm = this.fb.group({
@@ -52,7 +54,7 @@ export class AddEditUserComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.minLength(8)]],
       confirmPassword: [''],
-      isAdmin: [false, Validators.required],
+      isAdmin: [false, Validators.required], 
     }, {
       validator: this.mustMatch('password', 'confirmPassword')
     });
@@ -66,10 +68,16 @@ export class AddEditUserComponent implements OnInit {
         this.userService.getUserById(this.userId).subscribe({
           next: (data) => {
             this.user = data.data;
-            this.userForm.patchValue(this.user);
+            this.userForm.patchValue({
+              ...this.user,
+              isAdmin: this.user.isAdmin // Ensure the value matches the form control
+            });
           // Ensure the form fields are filled correctly
           this.userForm.get('password').setValue('');
           this.userForm.get('confirmPassword').setValue('');
+          //this.userForm.get('isAdmin').setValue(this.user.isAdmin);
+          // Manually trigger change detection if necessary
+          this.cd.detectChanges();
           },
           error: (err) => {
             console.error(err);

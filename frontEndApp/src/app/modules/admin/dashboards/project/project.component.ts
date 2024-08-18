@@ -112,7 +112,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     createClient() {
             this._router.navigate(['dashboards/clients/new']);
         }
-        deleteClient(id: string): void {
+    deleteClient(id: string): void {
             this._clientService.deleteClient(id).subscribe(
                 () => {
                     // Refresh the data after successful deletion

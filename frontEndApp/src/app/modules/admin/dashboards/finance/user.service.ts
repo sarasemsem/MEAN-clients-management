@@ -53,6 +53,7 @@ export class UserService {
     }
 
     deleteUser(id: string): Observable<any> {
+        console.log('Deleting user with ID:', id);
         return this._httpClient.delete<any>(`${environment.baseApi + rest.users}/${id}`, { withCredentials: true });
     }
 }

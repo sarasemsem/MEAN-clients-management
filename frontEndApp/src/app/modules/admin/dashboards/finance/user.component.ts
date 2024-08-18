@@ -9,19 +9,21 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { FuseConfirmationConfig, FuseConfirmationService } from '@fuse/services/confirmation';
 import { UserService } from 'app/modules/admin/dashboards/finance/user.service';
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-    selector: 'finance',
-    templateUrl: './finance.component.html',
+    selector: 'user',
+    templateUrl: './user.component.html',
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
     imports: [MatButtonModule, MatIconModule, MatMenuModule, MatDividerModule, NgApexchartsModule, MatTableModule, MatSortModule, NgClass, MatProgressBarModule, CurrencyPipe, DatePipe],
 })
-export class FinanceComponent implements OnInit, AfterViewInit, OnDestroy {
+export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
+
     @ViewChild('recentTransactionsTable', { read: MatSort }) recentTransactionsTable: MatSort;
 
     data: any;
@@ -29,11 +31,14 @@ export class FinanceComponent implements OnInit, AfterViewInit, OnDestroy {
     userDataSource: MatTableDataSource<any> = new MatTableDataSource();
     userTableColumns: string[] = ['firstName', 'lastName', 'email', 'isAdmin', 'action'];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-
+    adminsNmb: number = 0;
+    usersNmb: number = 0;
     /**
      * Constructor
      */
-    constructor(private _snackBar: MatSnackBar, private _router: Router, private _userService: UserService) { }
+    constructor(private _snackBar: MatSnackBar, 
+        private _fuseConfirmationService: FuseConfirmationService,
+        private _router: Router, private _userService: UserService) { }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Lifecycle hooks
@@ -56,6 +61,8 @@ export class FinanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
                 // If the data is an array, log each item
                 if (Array.isArray(this.data)) {
+                    this.adminsNmb = data.filter(user => user.isAdmin).length;
+                    this.usersNmb = data.filter(user => !user.isAdmin).length;
                     this.data.forEach((item, index) => {
                         console.log(`Item ${index}:`, item);
                     });
@@ -86,15 +93,17 @@ export class FinanceComponent implements OnInit, AfterViewInit, OnDestroy {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
-
+    createUser() {
+        this._router.navigate(['dashboards/settings/new']);
+    }
     editUser(user: any): void {
         console.log("Editing user:", user);
         this._router.navigate([`dashboards/settings/update/${user._id}`]);
     }
 
-    deleteUser(user: any): void {
-        console.log("Deleting user:", user);
-        this._userService.deleteUser(user._id).subscribe(
+    deleteUser(id: any): void {
+        console.log("Deleting user:", id);
+        this._userService.deleteUser(id).subscribe(
             () => {
                 // Refresh the data after successful deletion
                this._userService.getData().subscribe((data) => {
@@ -116,6 +125,47 @@ export class FinanceComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         );
     }
+
+    openConfirmationDialog(data : any): void
+    {   
+        const config: FuseConfirmationConfig = {
+            title: 'Remove contact',
+            message: 'Are you sure you want to remove this user permanently? <span class="font-medium">This action cannot be undone!</span>',
+            icon: {
+                show: true,
+                name: 'heroicons_outline:exclamation-triangle',
+                color: 'warn' as 'warn' | 'error' | 'primary' | 'accent' | 'basic' | 'info' | 'success' | 'warning',
+            },
+            actions: {
+                confirm: {
+                    show: true,
+                    label: 'Remove',
+                    color: 'warn',
+                },
+                cancel: {
+                    show: true,
+                    label: 'Cancel',
+                },
+            },
+            dismissible: true,
+        };
+
+        // Open the dialog and save the reference of it
+        const dialogRef = this._fuseConfirmationService.open(config);
+
+        // Subscribe to afterClosed from the dialog reference
+        dialogRef.afterClosed().subscribe((result) =>
+        {
+            // If the confirm button pressed...
+            if (result === 'confirmed')
+            {
+                // Delete
+                this.deleteUser(data._id);
+            }
+            console.log(result);
+        });
+    }  
+
     /**
      * Track by function for ngFor loops
      *

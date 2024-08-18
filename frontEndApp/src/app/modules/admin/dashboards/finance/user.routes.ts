@@ -1,13 +1,13 @@
 import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
-import { FinanceComponent } from 'app/modules/admin/dashboards/finance/finance.component';
+import { UsersComponent } from 'app/modules/admin/dashboards/finance/user.component';
 import { UserService } from 'app/modules/admin/dashboards/finance/user.service';
 import { AddEditUserComponent } from './add-edit-user/add-edit-user.component';
 
 export default [
     {
         path     : '',
-        component: FinanceComponent,
+        component: UsersComponent,
         resolve  : {
             data: () => inject(UserService).getData(),
         },

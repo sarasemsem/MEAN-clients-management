@@ -79,7 +79,7 @@ export const appRoutes: Route[] = [
             {path: 'dashboards', children: [
                 {path: 'clients', loadChildren: () => import('app/modules/admin/dashboards/project/project.routes')},
                 {path: 'analytics', loadChildren: () => import('app/modules/admin/dashboards/analytics/analytics.routes')},
-                {path: 'settings', loadChildren: () => import('app/modules/admin/dashboards/finance/finance.routes')},
+                {path: 'settings', loadChildren: () => import('app/modules/admin/dashboards/finance/user.routes')},
             ]},
 
             // Apps
