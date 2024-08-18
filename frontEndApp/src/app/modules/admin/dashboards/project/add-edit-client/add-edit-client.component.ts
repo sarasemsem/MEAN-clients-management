@@ -50,6 +50,7 @@ export class AddEditClientComponent implements OnInit {
 
     ngOnInit(): void {
         this.route.params.subscribe((params) => {
+            console.log(params);
             if (params['id']) {
                 this.isEditMode = true;
                 this.clientId = params['id'];

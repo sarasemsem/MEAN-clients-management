@@ -6,8 +6,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { fuseAnimations } from '@fuse/animations';
+import { AuthService } from '@fuse/auth/service/auth.service';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
-import { AuthService } from 'app/core/auth/auth.service';
 
 @Component({
     selector     : 'coming-soon-classic',

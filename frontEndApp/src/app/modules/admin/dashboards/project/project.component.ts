@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
+import { AuthService } from '@fuse/auth/service/auth.service';
 import { FuseConfirmationConfig, FuseConfirmationService } from '@fuse/services/confirmation';
 import { TranslocoModule } from '@ngneat/transloco';
 import { ClientService } from 'app/modules/admin/dashboards/project/project.service';
@@ -49,12 +50,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
     chartMonthlyExpenses: ApexOptions = {};
     chartYearlyExpenses: ApexOptions = {};
     data: any;
+    username: string;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
      */
-    constructor(private _snackBar: MatSnackBar,private _clientService: ClientService, private _router: Router,private _fuseConfirmationService: FuseConfirmationService) {}
+
+    constructor(private authService: AuthService ,private _snackBar: MatSnackBar,private _clientService: ClientService, private _router: Router,private _fuseConfirmationService: FuseConfirmationService) {}
 
     // -----------------------------------------------------------------------------------------------------
     // @ Lifecycle hooks
@@ -64,6 +67,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
      * On init
      */
     ngOnInit(): void {
+        this.username =this.authService.getUser().firstName; 
         // Get the data
         this._clientService.data$
             .pipe(takeUntil(this._unsubscribeAll))

@@ -9,8 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
+import { AuthService } from '@fuse/auth/service/auth.service';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
-import { AuthService } from 'app/core/auth/auth.service';
 
 @Component({
     selector     : 'sign-in-modern-reversed',

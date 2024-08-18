@@ -7,8 +7,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
+import { AuthService } from '@fuse/auth/service/auth.service';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
-import { AuthService } from 'app/core/auth/auth.service';
+
 import { finalize } from 'rxjs';
 
 @Component({
@@ -91,23 +92,25 @@ export class AuthForgotPasswordComponent implements OnInit
                     this.showAlert = true;
                 }),
             )
-            .subscribe(
-                (response) =>
+            .subscribe({
+                next: (response) =>
                 {
+                    console.log(response);
                     // Set the alert
                     this.alert = {
                         type   : 'success',
-                        message: 'Password reset sent! You\'ll receive an email if you are registered on our system.',
+                        message: 'Password reset link sent! You\'ll receive an email if you are registered on our system.',
                     };
                 },
-                (response) =>
+                error: (err) =>
                 {
+                    console.error(err.error.message);
                     // Set the alert
                     this.alert = {
                         type   : 'error',
                         message: 'Email does not found! Are you sure you are already a member?',
                     };
                 },
-            );
+    });
     }
 }

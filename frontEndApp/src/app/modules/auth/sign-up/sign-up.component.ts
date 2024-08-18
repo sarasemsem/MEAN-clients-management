@@ -9,8 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
+import { AuthService } from '@fuse/auth/service/auth.service';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
-import { AuthService } from 'app/core/auth/auth.service';
 
 @Component({
     selector     : 'auth-sign-up',
@@ -82,32 +82,5 @@ export class AuthSignUpComponent implements OnInit
 
         // Hide the alert
         this.showAlert = false;
-
-        // Sign up
-        this._authService.signUp(this.signUpForm.value)
-            .subscribe(
-                (response) =>
-                {
-                    // Navigate to the confirmation required page
-                    this._router.navigateByUrl('/confirmation-required');
-                },
-                (response) =>
-                {
-                    // Re-enable the form
-                    this.signUpForm.enable();
-
-                    // Reset the form
-                    this.signUpNgForm.resetForm();
-
-                    // Set the alert
-                    this.alert = {
-                        type   : 'error',
-                        message: 'Something went wrong, please try again.',
-                    };
-
-                    // Show the alert
-                    this.showAlert = true;
-                },
-            );
     }
 }

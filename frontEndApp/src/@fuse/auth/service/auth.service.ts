@@ -4,6 +4,7 @@ import { Observable, catchError, of, scheduled, switchMap, tap, throwError } fro
 import { environment, rest } from '@fuse/environments/environment';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
+import { CookieService } from 'ngx-cookie-service';
 
 
 @Injectable({
@@ -13,6 +14,7 @@ export class AuthService {
   private _httpClient = inject(HttpClient);
   private _userService = inject(UserService);
   private _authenticated: boolean = false;
+  private _cookieService = inject(CookieService);
   clear() {
     localStorage.clear();
   }
@@ -31,14 +33,17 @@ export class AuthService {
   }
 
   get authToken(): string | null {
-    return localStorage.getItem('accessToken');
+    return localStorage.getItem('access_token');
   }
 
   set authToken(token: string | null) {
     if (token !== null) {
-      localStorage.setItem('accessToken', token);
+      localStorage.setItem('access_token', token);
+      
+        // Store the token in a cookie as well
+        this._cookieService.set('access_token', token);
     } else {
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem('access_token');
     }
   }
 
@@ -65,7 +70,7 @@ export class AuthService {
         return throwError('User is already logged in.');
     }
 
-    return this._httpClient.post(environment.baseApi+ rest.login, { credentials }).pipe(
+    return this._httpClient.post(environment.baseApi+ rest.login+'/login', { credentials }).pipe(
         switchMap((response: any) => {
             // Ensure response structure matches
             if (response.success && response.data.user.token) {
@@ -97,7 +102,7 @@ export class AuthService {
     signOut(): Observable<any>
     {
         // Remove the access token from the local storage
-        localStorage.removeItem('accessToken');
+        localStorage.removeItem('access_token');
 
         // Set the authenticated flag to false
         this._authenticated = false;
@@ -112,7 +117,7 @@ export class AuthService {
      */
      forgotPassword(email: string): Observable<any>
      {
-         return this._httpClient.post('api/auth/forgot-password', email);
+         return this._httpClient.post(environment.baseApi+ rest.login+'/send-email', {email: email});
      }
  
      /**
@@ -120,9 +125,9 @@ export class AuthService {
       *
       * @param password
       */
-     resetPassword(password: string): Observable<any>
-     {
-         return this._httpClient.post('api/auth/reset-password', password);
+     resetPassword(resetObj: any): Observable<any>
+     {   console.log(resetObj);
+         return this._httpClient.post(environment.baseApi+ rest.login+'/reset-password', resetObj);
      }
  
 /**
