@@ -14,8 +14,6 @@ import { MockApiComponent } from 'app/modules/admin/ui/fuse-components/libraries
 import { FindByKeyComponent } from 'app/modules/admin/ui/fuse-components/pipes/find-by-key/find-by-key.component';
 import { ConfigComponent } from 'app/modules/admin/ui/fuse-components/services/config/config.component';
 import { ConfirmationComponent } from 'app/modules/admin/ui/fuse-components/services/confirmation/confirmation.component';
-import { MediaWatcherComponent } from 'app/modules/admin/ui/fuse-components/services/media-watcher/media-watcher.component';
-import { SplashScreenComponent } from 'app/modules/admin/ui/fuse-components/services/splash-screen/splash-screen.component';
 import { MustMatchComponent } from 'app/modules/admin/ui/fuse-components/validators/must-match/must-match.component';
 
 export default [
@@ -112,15 +110,7 @@ export default [
                     {
                         path     : 'confirmation',
                         component: ConfirmationComponent,
-                    },
-                    {
-                        path     : 'splash-screen',
-                        component: SplashScreenComponent,
-                    },
-                    {
-                        path     : 'media-watcher',
-                        component: MediaWatcherComponent,
-                    },
+                    }
                 ],
             },
             {
