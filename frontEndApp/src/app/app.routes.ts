@@ -65,12 +65,8 @@ export const appRoutes: Route[] = [
 
             // Dashboards
             {path: 'dashboards', children: [
-                {path: 'clients', loadChildren: () => import('app/modules/admin/dashboards/project/client.routes')},
-                {path: 'settings', loadChildren: () => import('app/modules/admin/dashboards/finance/user.routes')},
-            ]},
-
-            // Apps
-            {path: 'apps', children: [
+                {path: 'clients', loadChildren: () => import('app/modules/admin/dashboards/client/client.routes')},
+                {path: 'settings', loadChildren: () => import('app/modules/admin/dashboards/user/user.routes')},
             ]},
 
             // Pages
@@ -82,28 +78,10 @@ export const appRoutes: Route[] = [
                     {path: '404', loadChildren: () => import('app/modules/admin/pages/error/error-404/error-404.routes')},
                     {path: '500', loadChildren: () => import('app/modules/admin/pages/error/error-500/error-500.routes')}
                 ]},
-
-                // Invoice
-                {path: 'invoice', children: [
-                    {path: 'printable', children: [
-                    ]}
-                ]},
-
-                // Pricing
-                {path: 'pricing', children: [
-                  ]},
-
                 // Profile
                 {path: 'profile', loadChildren: () => import('app/modules/admin/pages/profile/profile.routes')},
             ]},
 
-            // User Interface
-            {path: 'ui', children: [
-                // Fuse Components
-                {path: 'fuse-components', loadChildren: () => import('app/modules/admin/ui/fuse-components/fuse-components.routes')},
-                // Icons
-                {path: 'icons', loadChildren: () => import('app/modules/admin/ui/icons/icons.routes')},
-        ]},
             // 404 & Catch all
             {path: '404-not-found', pathMatch: 'full', loadChildren: () => import('app/modules/admin/pages/error/error-404/error-404.routes')},
             {path: '**', redirectTo: '404-not-found'}

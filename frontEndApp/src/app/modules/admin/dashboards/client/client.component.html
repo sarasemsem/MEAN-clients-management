@@ -1,0 +1,244 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Header -->
+    <div class="bg-card">
+        <div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
+            <div
+                class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-8 sm:my-12"
+            >
+                <!-- Avatar and name -->
+                <div class="flex flex-auto items-center min-w-0">
+                    <div class="flex-0 w-16 h-16 rounded-full overflow-hidden">
+                        <img
+                            class="w-full h-full object-cover"
+                            src="assets/images/avatars/avatar0.jpg"
+                        />
+                    </div>
+                    <div class="flex flex-col min-w-0 ml-4">
+                        <ng-container *transloco="let t">
+                            <div
+                                class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate"
+                            >
+                                {{ t("welcome-back") }}, {{username}}!
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-col flex-auto w-full">
+        <div class="flex flex-wrap w-full max-w-screen-xl mx-auto p-6 md:p-8">
+            <div class="grid grid-cols-1 sm:grid-cols-6 gap-6 w-full min-w-0">
+                <!-- Weekly Mock Test Scores -->
+                <div
+                    class="sm:col-span-3 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden"
+                >
+                    <div class="flex items-start justify-between">
+                        <div
+                            class="text-lg font-medium tracking-tight leading-6 truncate"
+                        >
+                            Weekly Mock Test Scores
+                        </div>
+                    </div>
+                    <div class="flex items-center mt-1">
+                        <div class="flex flex-col flex-auto ml-8">
+                            <apx-chart
+                                class="flex-auto w-full h-16"
+                                [chart]="chartWeeklyExpenses.chart"
+                                [colors]="chartWeeklyExpenses.colors"
+                                [series]="chartWeeklyExpenses.series"
+                                [stroke]="chartWeeklyExpenses.stroke"
+                                [tooltip]="chartWeeklyExpenses.tooltip"
+                                [xaxis]="chartWeeklyExpenses.xaxis"
+                                [yaxis]="chartWeeklyExpenses.yaxis"
+                            ></apx-chart>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Mock Test Scores -->
+                <div
+                    class="sm:col-span-3 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden"
+                >
+                    <div class="flex items-start justify-between">
+                        <div
+                            class="text-lg font-medium tracking-tight leading-6 truncate"
+                        >
+                            Monthly Mock Test Scores
+                        </div>
+                    </div>
+                    <div class="flex items-center mt-1">
+                        <div class="flex flex-col flex-auto ml-8">
+                            <apx-chart
+                                class="flex-auto w-full h-16"
+                                [chart]="chartMonthlyExpenses.chart"
+                                [colors]="chartMonthlyExpenses.colors"
+                                [series]="chartMonthlyExpenses.series"
+                                [stroke]="chartMonthlyExpenses.stroke"
+                                [tooltip]="chartMonthlyExpenses.tooltip"
+                                [xaxis]="chartMonthlyExpenses.xaxis"
+                                [yaxis]="chartMonthlyExpenses.yaxis"
+                            ></apx-chart>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List of clients -->
+                <div
+                    class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                    <!-- Title and action buttons -->
+                    <div class="flex items-center justify-between w-full">
+                        <div>
+                            <h2 class="text-3xl font-semibold tracking-tight leading-8">
+                                Clients List
+                            </h2>
+                            <div class="font-medium tracking-tight text-secondary">
+                                Clients list overview
+                            </div>
+                        </div>
+                        <div class="flex items-center ml-6">
+                            <button
+                            class="ml-4"
+                            mat-flat-button
+                            [color]="'primary'"
+                            (click)="createClient()">
+                            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                            <span class="ml-2 mr-1">Add</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
+                        <table mat-table [dataSource]="data">
+                            <!-- firstName -->
+                            <ng-container matColumnDef="firstName">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Client's name
+                                </th>
+                                <td mat-cell *matCellDef="let row">
+                                    {{ row.firstName }} {{ row.lastName }}
+                                </td>
+                            </ng-container>
+                            <!-- Address -->
+                            <ng-container matColumnDef="address">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Address
+                                </th>
+                                <td mat-cell *matCellDef="let row">
+                                    {{ row.address }}
+                                </td>
+                            </ng-container>
+                            <!-- Phone -->
+                            <ng-container matColumnDef="phone">
+                                <th mat-header-cell *matHeaderCellDef>Phone</th>
+                                <td mat-cell *matCellDef="let row">
+                                    {{ row.phone }}
+                                </td>
+                            </ng-container>
+                            <!-- Test Appointment -->
+                            <ng-container matColumnDef="testAppoinment">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Test Appointment
+                                </th>
+                                <td mat-cell *matCellDef="let row">
+                                    <ng-container *ngIf="row.testAppoinment; else noAppointment">
+                                        {{ row.testAppoinment | date: 'shortDate' }}
+                                    </ng-container>
+                                    <ng-template #noAppointment>
+                                        <span>No appointment scheduled</span>
+                                    </ng-template>
+                                </td>
+                            </ng-container>
+                            <!-- Mock Test Score percentage -->
+                            <ng-container matColumnDef="MockTestScore">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Mock Test Score
+                                </th>
+                                <td mat-cell *matCellDef="let row">
+                                    <span class="flex items-center">
+                                        <span>
+                                            <!-- Low -->
+                                            <span
+                                                class="flex items-end w-1 h-4 bg-red-200 rounded overflow-hidden"
+                                                *ngIf="row.MockTestScore < 30 && row.MockTestScore > 0"
+                                            >
+                                                <span
+                                                    class="flex w-full h-1/3 bg-red-600"
+                                                ></span>
+                                            </span>
+                                            <!-- Medium -->
+                                            <span
+                                                class="flex items-end w-1 h-4 bg-orange-200 rounded overflow-hidden"
+                                                *ngIf="
+                                                    row.MockTestScore >= 30 &&
+                                                    row.MockTestScore < 80
+                                                "
+                                            >
+                                                <span
+                                                    class="flex w-full h-2/4 bg-orange-400"
+                                                ></span>
+                                            </span>
+                                            <!-- High -->
+                                            <span
+                                                class="flex items-end w-1 h-4 bg-green-100 rounded overflow-hidden"
+                                                *ngIf="row.MockTestScore >= 80"
+                                            >
+                                                <span
+                                                    class="flex w-full h-full bg-green-400"
+                                                ></span>
+                                            </span>
+                                        </span>
+                                        <span class="ml-3 leading-4"
+                                            >{{ row.MockTestScore ? row.MockTestScore + '%' : 'None' }}</span
+                                        >
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <!-- Action -->
+                            <ng-container matColumnDef="actions">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Action
+                                </th>
+                                <td mat-cell *matCellDef="let row" class="fixed-column">
+                                    <button mat-icon-button (click)="editClient(row)">
+                                        <mat-icon 
+                                        class="text-hint icon-size-4"
+                                        [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                                    </button>
+                                    <button mat-icon-button (click)="openConfirmationDialog(row)">
+                                        <mat-icon
+                                            class="text-hint icon-size-4"
+                                            [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+                            <tr
+                                mat-header-row
+                                *matHeaderRowDef="[
+                                    'firstName',
+                                    'address',
+                                    'phone',
+                                    'testAppoinment',
+                                    'MockTestScore',
+                                    'actions'
+                                ]"></tr>
+                            <tr
+                                mat-row
+                                *matRowDef="
+                                    let row;
+                                    columns: [
+                                        'firstName',
+                                        'address',
+                                        'phone',
+                                        'testAppoinment',
+                                        'MockTestScore',
+                                        'actions'
+                                    ] "></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
