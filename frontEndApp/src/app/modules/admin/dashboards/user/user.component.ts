@@ -1,10 +1,9 @@
-import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -20,7 +19,7 @@ import { Subject, takeUntil } from 'rxjs';
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [MatButtonModule, MatIconModule, MatMenuModule, MatDividerModule, NgApexchartsModule, MatTableModule, MatSortModule, NgClass, MatProgressBarModule, CurrencyPipe, DatePipe],
+    imports: [MatButtonModule, MatIconModule, MatMenuModule, MatDividerModule, NgApexchartsModule, MatTableModule, MatSortModule, NgClass, DatePipe],
 })
 export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -129,7 +128,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     openConfirmationDialog(data : any): void
     {   
         const config: FuseConfirmationConfig = {
-            title: 'Remove contact',
+            title: 'Remove User',
             message: 'Are you sure you want to remove this user permanently? <span class="font-medium">This action cannot be undone!</span>',
             icon: {
                 show: true,

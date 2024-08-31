@@ -1,20 +1,20 @@
-import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from '@fuse/auth/service/auth.service';
 import { FuseConfirmationConfig, FuseConfirmationService } from '@fuse/services/confirmation';
 import { TranslocoModule } from '@ngneat/transloco';
 import { ClientService } from 'app/modules/admin/dashboards/client/client.service';
-import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
 import { Subject, takeUntil } from 'rxjs';
+import { ClientTestDataComponent } from './client-test-data/client-test-data.component';
 
 @Component({
     selector: 'client',
@@ -22,7 +22,7 @@ import { Subject, takeUntil } from 'rxjs';
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule, NgFor, NgIf, MatTableModule, NgClass,CurrencyPipe, DatePipe],
+    imports: [ClientTestDataComponent,TranslocoModule, MatSidenavModule,RouterLink, MatIconModule, RouterOutlet, MatButtonModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgFor, NgIf, MatTableModule, NgClass, DatePipe],
     styles: [`
     .fixed-column {
             position: -webkit-sticky; /* For Safari */
@@ -41,23 +41,23 @@ import { Subject, takeUntil } from 'rxjs';
         }    
     `]
 })
-export class ProjectComponent implements OnInit, OnDestroy {
-
-    chartGithubIssues: ApexOptions = {};
-    chartTaskDistribution: ApexOptions = {};
-    chartBudgetDistribution: ApexOptions = {};
-    chartWeeklyExpenses: ApexOptions = {};
-    chartMonthlyExpenses: ApexOptions = {};
-    chartYearlyExpenses: ApexOptions = {};
+export class ClientComponent implements OnInit, OnDestroy {
     data: any;
     username: string;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-
+    @ViewChild('matDrawer', { static: true }) matDrawer: MatDrawer;
+    drawerMode: 'side';
+    selectedItem: any;
     /**
      * Constructor
      */
 
-    constructor(private authService: AuthService ,private _snackBar: MatSnackBar,private _clientService: ClientService, private _router: Router,private _fuseConfirmationService: FuseConfirmationService) {}
+    constructor(private authService: AuthService,
+        private _activatedRoute: ActivatedRoute,
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _snackBar: MatSnackBar,
+        private _clientService: ClientService,
+        private _router: Router, private _fuseConfirmationService: FuseConfirmationService) { }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Lifecycle hooks
@@ -67,33 +67,30 @@ export class ProjectComponent implements OnInit, OnDestroy {
      * On init
      */
     ngOnInit(): void {
-        this.username =this.authService.getUser().firstName; 
+        this.username = this.authService.getUser().firstName;
         // Get the data
         this._clientService.data$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((data) => {
                 // Store the data
                 this.data = data;
-
-                // Prepare the chart data
-                this._prepareChartData();
             });
-            console.log(this.data);
-        // Attach SVG fill fixer to all ApexCharts
-        window['Apex'] = {
-            chart: {
-                events: {
-                    mounted: (chart: any, options?: any): void => {
-                        this._fixSvgFill(chart.el);
-                    },
-                    updated: (chart: any, options?: any): void => {
-                        this._fixSvgFill(chart.el);
-                    },
-                },
-            },
-        };
+        console.log(this.data);
     }
 
+     /*  openTestDetails(clientId: string): void {
+        this._clientService.getClientById(clientId).subscribe(client => {
+            this._clientService.setSelectedClient(client); // Set the selected client correctly
+            this.matDrawer.open(); // Open the drawer after client is set
+        });
+    } */
+    openTestDetails(clientId: string): void {
+        this._clientService.getClientById(clientId).subscribe(client => {
+            this._clientService.setSelectedClient(client); // Set the selected client
+            this._changeDetectorRef.markForCheck(); // Ensure the view updates
+            this.matDrawer.open(); // Open the drawer
+        });
+    }
     /**
      * On destroy
      */
@@ -106,44 +103,55 @@ export class ProjectComponent implements OnInit, OnDestroy {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+    /**
+ * On backdrop clicked
+ */
+    onBackdropClicked(): void {
+        // Go back to the list
+        this._router.navigate(['./'], { relativeTo: this._activatedRoute });
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+        this.matDrawer.close();
+         
+    }
     editClient(row: any) {
         this._router.navigate([`dashboards/clients/new/${row._id}`]);
-        }
+    }
     createClient() {
-            this._router.navigate(['dashboards/clients/new']);
-        }
+        this._router.navigate(['dashboards/clients/new']);
+    }
     deleteClient(id: string): void {
-            this._clientService.deleteClient(id).subscribe(
-                () => {
-                    // Refresh the data after successful deletion
-                   this._clientService.getData().subscribe((data) => {
+        this._clientService.deleteClient(id).subscribe(
+            () => {
+                // Refresh the data after successful deletion
+                this._clientService.getData().subscribe((data) => {
                     // Store the data
                     this.data = data;
                 });
-                    this._snackBar.open('Client deleted successfully!', '', {
-                        horizontalPosition: 'end',
-                        verticalPosition: 'top',
-                        duration: 2000,
-                    });
-                },
-                (error) => {
-                    this._snackBar.open('Failed to delete client. Please try again.', '', {
-                        horizontalPosition: 'end',
-                        verticalPosition: 'top',
-                        duration: 2000,
-                    });
-                }
-            );
-        }
-    openConfirmationDialog(data : any): void
-    {   
+                this._snackBar.open('Client deleted successfully!', '', {
+                    horizontalPosition: 'end',
+                    verticalPosition: 'top',
+                    duration: 2000,
+                });
+            },
+            (error) => {
+                this._snackBar.open('Failed to delete client. Please try again.', '', {
+                    horizontalPosition: 'end',
+                    verticalPosition: 'top',
+                    duration: 2000,
+                });
+            }
+        );
+    }
+    openConfirmationDialog(data: any): void {
         const config: FuseConfirmationConfig = {
-            title: 'Remove contact',
+            title: 'Remove client',
             message: 'Are you sure you want to remove this client permanently? <span class="font-medium">This action cannot be undone!</span>',
             icon: {
                 show: true,
                 name: 'heroicons_outline:exclamation-triangle',
-                color: 'warn' as 'warn' | 'error' | 'primary' | 'accent' | 'basic' | 'info' | 'success' | 'warning',
+                color: 'warn',
             },
             actions: {
                 confirm: {
@@ -163,17 +171,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
         const dialogRef = this._fuseConfirmationService.open(config);
 
         // Subscribe to afterClosed from the dialog reference
-        dialogRef.afterClosed().subscribe((result) =>
-        {
+        dialogRef.afterClosed().subscribe((result) => {
             // If the confirm button pressed...
-            if (result === 'confirmed')
-            {
+            if (result === 'confirmed') {
                 // Delete
                 this.deleteClient(data._id);
             }
             console.log(result);
         });
-    }        
+    }
     /**
      * Track by function for ngFor loops
      *
@@ -188,191 +194,5 @@ export class ProjectComponent implements OnInit, OnDestroy {
     // @ Private methods
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * Fix SVG fill references. This fix must be applied to all ApexCharts
-     * in order to fix 'black color issues on certain browsers' caused by
-     * '<use> SVG elements' that don't inherit 'fill' attribute correctly
-     * from their parents.
-     *
-     * @param element
-     * @private
-     */
-    private _fixSvgFill(element: Element): void {
-        // Current URL
-        const currentURL = this._router.url;
-
-        // 1. Find all <use> elements
-        // 2. Iterate through them
-        // 3. Get the 'href' attribute
-        // 4. Check if the 'href' attribute starts with '#'
-        // 5. If it does, prepend the current URL
-        Array.from(element.querySelectorAll('*[fill]')).forEach((el) => {
-            const fill = el.getAttribute('fill');
-
-            if (fill?.indexOf('url(') !== -1) {
-                el.setAttribute('fill', 'url(' + currentURL + fill.split('url(')[1]);
-            }
-        });
-    }
-
-    /**
-     * Prepare the chart data from the data
-     */private _prepareChartData(): void {
-    // Weekly expensesj
-    this.chartWeeklyExpenses = {
-        chart: {
-            animations: {
-                enabled: false,
-            },
-            fontFamily: 'inherit',
-            foreColor: 'var(--fuse-text-secondary)',
-            height: '100%',
-            type: 'line', // Change type to 'line' for line chart
-            toolbar: {
-                show: false,
-            },
-            zoom: {
-                enabled: false,
-            },
-        },
-        colors: ['#22D3EE'],
-        dataLabels: {
-            enabled: true,
-            formatter: (val: number): string => `${val}%`,
-            textAnchor: 'start',
-            style: {
-                fontSize: '13px',
-                fontWeight: 500,
-            },
-            background: {
-                borderWidth: 0,
-                padding: 4,
-            },
-            offsetY: -15,
-        },
-        markers: {
-            strokeColors: '#818CF8',
-            strokeWidth: 4,
-        },
-        plotOptions: {
-            radar: {
-                polygons: {
-                    strokeColors   : 'var(--fuse-border)',
-                    connectorColors: 'var(--fuse-border)',
-                },
-            },
-        },
-        fill: {
-            opacity: 0.5,
-        },
-        grid: {
-            borderColor: 'var(--fuse-border)',
-            position: 'back',
-            show: false,
-            strokeDashArray: 6,
-            xaxis: {
-                lines: {
-                    show: false,
-                },
-            },
-            yaxis: {
-                lines: {
-                    show: false,
-                },
-            },
-        },
-        series: [{
-            name: 'Weekly Mock Test Scores',
-            data: this.data.map((item: any) => ({ x: item.testAppoinment, y: item.MockTestScore }))
-        }],
-        stroke: {
-            curve: 'smooth',
-        },
-        tooltip: {
-            followCursor: true,
-            theme: 'dark',
-        },
-        xaxis: {
-            type: 'category',
-            categories: this.data.map((item: any) => item.testAppoinment),
-        },
-        yaxis: {
-            labels: {
-                formatter: (val): string => `${val}`, // Adjust formatting if needed
-            },
-            show: false,
-        },
-    };
-
-    // Monthly expenses
-    this.chartMonthlyExpenses = {
-        chart: {
-            animations: {
-                enabled: false,
-            },
-            fontFamily: 'inherit',
-            foreColor: 'var(--fuse-text-secondary)',
-            height: '100%',
-            type: 'line', // Change type to 'line' for line chart
-            toolbar: {
-                show: false,
-            },
-            zoom: {
-                enabled: false,
-            },
-        },
-        colors: ['#4ADE80'],
-        dataLabels: {
-            enabled: false,
-        },
-        fill: {
-            opacity: 0.5,
-        },
-        grid: {
-            borderColor: 'var(--fuse-border)',
-            position: 'back',
-            show: false,
-            strokeDashArray: 6,
-            xaxis: {
-                lines: {
-                    show: false,
-                },
-            },
-            yaxis: {
-                lines: {
-                    show: false,
-                },
-            },
-        },
-        legend: {
-            show: false,
-        },
-        series: [{
-            name: 'Monthly Mock Test Scores',
-            data: this.data.map((item: any) => ({ x: item.testAppoinment, y: item.MockTestScore }))
-        }],
-        stroke: {
-            curve: 'smooth',
-        },
-        tooltip: {
-            followCursor: true,
-            theme: 'dark',
-        },
-        xaxis: {
-            type: 'category',
-            categories: this.data.map((item: any) => item.testAppoinment),
-            axisTicks: {
-                show: false,
-            },
-            axisBorder: {
-                show: false,
-            }
-        },
-        yaxis: {
-            show: false,
-        }
-    };
-    // Add similar configurations for yearly expenses if needed.
-}
 
 }

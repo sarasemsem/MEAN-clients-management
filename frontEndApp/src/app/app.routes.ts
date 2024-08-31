@@ -4,19 +4,12 @@ import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 
-// @formatter:off
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const appRoutes: Route[] = [
 
     // Redirect empty path to '/dashboards/clients'
     {path: '', pathMatch : 'full', redirectTo: 'dashboards/clients'},
 
-    // Redirect signed-in user to the '/dashboards/clients'
-    //
     // After the user signs in, the sign-in page will redirect the user to the 'signed-in-redirect'
-    // path. Below is another redirection for that path to redirect the user to the desired
-    // location. This is a small convenience to keep all main routes together here on this file.
     {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'dashboards/clients'},
 
     // Auth routes for guests
@@ -51,8 +44,6 @@ export const appRoutes: Route[] = [
             {path: 'unlock-session', loadChildren: () => import('app/modules/auth/unlock-session/unlock-session.routes')}
         ]
     },
-
-    // Admin routes
     {
         path: '',
         canActivate: [AuthGuard],
@@ -71,8 +62,6 @@ export const appRoutes: Route[] = [
 
             // Pages
             {path: 'pages', children: [
-                // Authentication
-                {path: 'authentication', loadChildren: () => import('app/modules/admin/pages/authentication/authentication.routes')},
                 // Error
                 {path: 'error', children: [
                     {path: '404', loadChildren: () => import('app/modules/admin/pages/error/error-404/error-404.routes')},

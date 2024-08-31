@@ -11,6 +11,7 @@ export const rest = {
   login:"/api/auth",
   users:"/api/user",
   clients:"/api/clients",
+  mockTest:"/api/clientTestData",
   production: false
 };
 /*
