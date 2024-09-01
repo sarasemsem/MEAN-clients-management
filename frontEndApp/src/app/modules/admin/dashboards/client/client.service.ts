@@ -53,9 +53,12 @@ export class ClientService {
     }
 
     updateMockTest(data: any): Observable<any> {
-        return this._httpClient.put<any>(`${environment.baseApi + rest.clients}/${data._id}`, data);
+        return this._httpClient.put<any>(`${environment.baseApi + rest.mockTest}/${data.id}`, data);
     }
     addMockTest(data: any): Observable<any> {
         return this._httpClient.post<any>(environment.baseApi + rest.mockTest, data);
+    }
+    deleteMockTest(id: string): Observable<any> {
+        return this._httpClient.delete<any>(`${environment.baseApi + rest.mockTest}/${id}`);
     }
 }

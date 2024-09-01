@@ -47,27 +47,6 @@
                         <mat-icon class="icon-size-5" matSuffix svgIcon="heroicons_solid:map-pin"></mat-icon>
                     </mat-form-field>
                 </div>
-                <div class="flex">
-                    <mat-form-field class="flex-auto">
-                        <input matInput [matDatepicker]="picker2" placeholder="Mock driving test date" formControlName="testAppoinment" />
-                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                        <mat-datepicker #picker2></mat-datepicker>
-                    </mat-form-field>
-                </div>
-                <div class="flex">
-                    <mat-form-field class="flex-auto">
-                        <input matInput 
-                        type="number" 
-                        step="0.50" 
-                        min="0"
-                        max="100"
-                        placeholder=" Test Score" formControlName="MockTestScore" />
-                        <mat-icon class="icon-size-5" matSuffix svgIcon="heroicons_solid:receipt-percent"></mat-icon>
-                        <mat-error *ngIf="clientForm.get('MockTestScore').hasError('pattern')">
-                            Enter a valid number.
-                        </mat-error>
-                    </mat-form-field>
-                </div>
                 <div class="flex items-center justify-end border-t -mx-8 mt-8 px-8 py-5 bg-gray-50 dark:bg-gray-700">
                     <button mat-button type="submit" (click)="onCancel()">Cancel</button>
                     <button class="px-6 ml-3" mat-flat-button color="primary" (click)="onSave()">{{ isEditMode ? 'Update' : 'Add' }}</button>

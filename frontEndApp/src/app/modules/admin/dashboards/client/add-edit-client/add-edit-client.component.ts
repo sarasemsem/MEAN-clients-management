@@ -43,8 +43,6 @@ export class AddEditClientComponent implements OnInit {
             email: ['', [Validators.email]],
             phone: ['', Validators.required],
             address: [''],
-            testAppoinment: [''],
-            MockTestScore: [null, [Validators.pattern('^[0-9]*\\.?[0-9]+$')]] // Allows decimal numbers
         });
     }
 
@@ -66,7 +64,7 @@ export class AddEditClientComponent implements OnInit {
             if (this.isEditMode) {
                 this.clientService.updateClient({ ...this.clientForm.value, id: this.clientId }).subscribe(() => {
                     //this.router.navigate(['dashboards/clients']);
-                    this._snackBar.open('Client deleted successfully!', '', {
+                    this._snackBar.open('Client updated successfully!', '', {
                         horizontalPosition: 'end',
                         verticalPosition: 'top',
                         duration: 2000,

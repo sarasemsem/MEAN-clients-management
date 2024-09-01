@@ -1,5 +1,5 @@
 <div class="flex flex-col flex-auto">
-    <form class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto" (ngSubmit)="saveAppointment()">
+    <form class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto">
         <!-- Header -->
         <div class="flex items-center justify-between -mt-3 -ml-4">
             <div class="text-xl font-medium">Client Mock Test</div>
@@ -20,18 +20,42 @@
         <!-- Information Section -->
         <div *ngIf="!showForm && client && client.tests.length > 0">
             <div *ngFor="let test of client.tests; let i = index" class="text-lg font-medium mt-8">#{{ i + 1 }}
+                <button
+                                                mat-icon-button
+                                                (click)="showEditForm(test)"
+                                            >
+                                                <mat-icon
+                                                    class="text-hint icon-size-4"
+                                                    [svgIcon]="
+                                                        'heroicons_solid:pencil'
+                                                    "
+                                                ></mat-icon>
+                                            </button>
+                                            <button
+                                                mat-icon-button
+                                                (click)="
+                                                    openConfirmationDialog(test)
+                                                "
+                                            >
+                                                <mat-icon
+                                                    class="text-hint icon-size-4"
+                                                    [svgIcon]="
+                                                        'heroicons_outline:trash'
+                                                    "
+                                                ></mat-icon>
+                                            </button>
             <div class="flex flex-col mt-4 border-t border-b divide-y font-medium">
                 <div class="flex items-center justify-between py-3" *ngIf="test?.testAppoinment">
                     <div class="text-secondary">Test Date</div>
-                    <div class="ng-star-inserted">{{ test.testAppoinment }}</div>
-                    <div class="text-secondary">Test Score</div>
-                    <div class="ng-star-inserted">{{ test.MockTestScore }}</div>
+                    <span>{{ test.testAppoinment | date : "shortDate"}}</span>
+                    <div class="text-secondary" *ngIf="test?.MockTestScore">Test Score</div>
+                    <span *ngIf="test?.MockTestScore">{{ test.MockTestScore }}</span>
                 </div>
-                <div class="flex items-center justify-between py-3" *ngIf="test?.beginTest">
-                    <div class="text-secondary">Start Test</div>
-                    <div class="ng-star-inserted">{{ test.beginTest ? 'Started' : 'Finished or not yet' }}</div>
+                <div class="flex items-center justify-between py-3">
+                     <div *ngIf="test?.beginTest" class="text-secondary">Start Test</div>
+                    <span>{{ test.beginTest ? 'Finished' : 'Not yet' }}</span>
                     <div *ngIf="test?.adressMac" class="text-secondary">Station NB:</div>
-                    <div class="ng-star-inserted" *ngIf="test?.adressMac">{{ client.adressMac }}</div>
+                    <span *ngIf="test?.adressMac">{{ test.adressMac }}</span>
                 </div>
             </div>
         </div>
@@ -68,7 +92,7 @@
                     <ng-container *ngIf="isStarted">
                         <div class="flex items-center justify-center">
                             <mat-icon class="text-primary" [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
-                            <span class="ml-2 font-semibold">In hold</span>
+                            <span class="ml-2 font-semibold">In hold/ Finished</span>
                         </div>
                     </ng-container>
                 </button>
@@ -80,13 +104,14 @@
                         <mat-option value="02:1A:2B:3C:4D:5E">Poste n*3</mat-option>
                     </mat-select>
                 </mat-form-field>
-
-                <!-- Cancel/Done Button -->
+                
+                <div class="flex justify-between mt-4">
+                    <!-- Cancel/Done Button -->
                 <button type="button" mat-button (click)="cancelAppointment()">
                     Cancel / Done
                 </button>
-                <div class="flex justify-between mt-4">
-                    <button type="submit" mat-flat-button [color]="'primary'">
+                    <button type="submit" mat-flat-button (click)="saveAppointment()"
+                    [color]="'primary'">
                         Save Appointment
                     </button>
                 </div>

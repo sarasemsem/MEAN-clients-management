@@ -180,6 +180,22 @@ export class ClientComponent implements OnInit, OnDestroy {
             console.log(result);
         });
     }
+    getLatestTestDateAndScore(tests: any[]): { date: Date | null, score: number | null } {
+        if (!tests || tests.length === 0) {
+            return { date: null, score: null };
+        }
+    
+        // Sort tests by date, assuming `testAppoinment` is a valid date string or Date object
+        const sortedTests = tests.sort(
+            (a, b) => new Date(b.testAppoinment).getTime() - new Date(a.testAppoinment).getTime()
+        );
+    
+        // Return the date and score of the latest test
+        return {
+            date: sortedTests[0].testAppoinment,
+            score: sortedTests[0].MockTestScore ?? null
+        };
+    }    
     /**
      * Track by function for ngFor loops
      *

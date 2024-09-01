@@ -121,88 +121,68 @@
                                             Test Appointment
                                         </th>
                                         <td mat-cell *matCellDef="let row">
-                                            <ng-container
-                                                *ngIf="
-                                                    row.testAppoinment;
-                                                    else noAppointment
-                                                "
-                                            >
                                                 <a
                                                     class="flex flex-col m-2 p-4 shadow rounded-2xl cursor-pointer"
-                                                    (click)="
-                                                        openTestDetails(row._id)
-                                                    "
-                                                >
-                                                    {{
-                                                        row.testAppoinment
-                                                            | date : "shortDate"
-                                                    }}
+                                                    (click)="openTestDetails(row._id)">
+                                                        <ng-container
+                                                         *ngIf=" row.tests.length >0 ; else noAppointment">
+                                                         {{ getLatestTestDateAndScore(row.tests)?.date | date: 'shortDate' }}
+                                                        </ng-container>
+                                                            <ng-template #noAppointment>
+                                                                <span>No appointment scheduled</span>
+                                                            </ng-template>
                                                 </a>
-                                            </ng-container>
-                                            <ng-template #noAppointment>
-                                                <span
-                                                    >No appointment
-                                                    scheduled</span
-                                                >
-                                            </ng-template>
                                         </td>
                                     </ng-container>
-                                    <!-- Mock Test Score percentage -->
+                                    <!-- Mock Test Score -->
                                     <ng-container matColumnDef="MockTestScore">
                                         <th mat-header-cell *matHeaderCellDef>
                                             Mock Test Score
                                         </th>
                                         <td mat-cell *matCellDef="let row">
-                                            <span class="flex items-center">
-                                                <span>
-                                                    <!-- Low -->
-                                                    <span
-                                                        class="flex items-end w-1 h-4 bg-red-200 rounded overflow-hidden"
-                                                        *ngIf="
-                                                            row.MockTestScore <
-                                                                30 &&
-                                                            row.MockTestScore >
-                                                                0
-                                                        "
-                                                    >
+                                            <ng-container *ngIf="row.tests.length > 0; else noScore">
+                                                <span class="flex items-center">
+                                                    <span>
+                                                        <!-- Low -->
                                                         <span
-                                                            class="flex w-full h-1/3 bg-red-600"
-                                                        ></span>
+                                                            class="flex items-end w-1 h-4 bg-red-200 rounded overflow-hidden"
+                                                            *ngIf="
+                                                                getLatestTestDateAndScore(row.tests)?.score < 30 &&
+                                                                getLatestTestDateAndScore(row.tests)?.score > 0
+                                                            "
+                                                        >
+                                                            <span class="flex w-full h-1/3 bg-red-600"></span>
+                                                        </span>
+                                                        <!-- Medium -->
+                                                        <span
+                                                            class="flex items-end w-1 h-4 bg-orange-200 rounded overflow-hidden"
+                                                            *ngIf="
+                                                                getLatestTestDateAndScore(row.tests)?.score >= 30 &&
+                                                                getLatestTestDateAndScore(row.tests)?.score < 80
+                                                            "
+                                                        >
+                                                            <span class="flex w-full h-2/4 bg-orange-400"></span>
+                                                        </span>
+                                                        <!-- High -->
+                                                        <span
+                                                            class="flex items-end w-1 h-4 bg-green-100 rounded overflow-hidden"
+                                                            *ngIf="getLatestTestDateAndScore(row.tests)?.score >= 80"
+                                                        >
+                                                            <span class="flex w-full h-full bg-green-400"></span>
+                                                        </span>
                                                     </span>
-                                                    <!-- Medium -->
-                                                    <span
-                                                        class="flex items-end w-1 h-4 bg-orange-200 rounded overflow-hidden"
-                                                        *ngIf="
-                                                            row.MockTestScore >=
-                                                                30 &&
-                                                            row.MockTestScore <
-                                                                80
-                                                        "
-                                                    >
-                                                        <span
-                                                            class="flex w-full h-2/4 bg-orange-400"
-                                                        ></span>
-                                                    </span>
-                                                    <!-- High -->
-                                                    <span
-                                                        class="flex items-end w-1 h-4 bg-green-100 rounded overflow-hidden"
-                                                        *ngIf="
-                                                            row.MockTestScore >=
-                                                            80
-                                                        "
-                                                    >
-                                                        <span
-                                                            class="flex w-full h-full bg-green-400"
-                                                        ></span>
+                                                    <span class="ml-3 leading-4">
+                                                        {{
+                                                            getLatestTestDateAndScore(row.tests)?.score
+                                                                ? getLatestTestDateAndScore(row.tests)?.score + '%'
+                                                                : 'None'
+                                                        }}
                                                     </span>
                                                 </span>
-                                                <span class="ml-3 leading-4">{{
-                                                    row.MockTestScore
-                                                        ? row.MockTestScore +
-                                                          "%"
-                                                        : "None"
-                                                }}</span>
-                                            </span>
+                                            </ng-container>
+                                            <ng-template #noScore>
+                                                <span>No score available</span>
+                                            </ng-template>
                                         </td>
                                     </ng-container>
                                     <!-- Action -->
